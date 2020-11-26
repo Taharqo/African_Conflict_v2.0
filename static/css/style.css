@@ -1,0 +1,75 @@
+#map {
+    height: 100%;
+}
+
+/* Body / Graph / Map / Dropdown */
+body {
+    padding: 0;
+    margin: 0;
+    background-color:#191a1a;
+    overflow-x: hidden;
+    height: 100%;
+    position: relative;
+    font-family: 'proxima_nova_rgregular';
+  }
+
+  .panel-body{
+    background-color:#191a1a  ;
+  }
+
+#countryDD {
+    /* font-weight: bolder; */
+    color: white ;
+    background-color: gray;
+    border-width: 0 1px;
+    border: solid;
+    /* border-color: white  ; */
+    padding: 5px;
+    font-size: small;
+    font-family: 'proxima_nova_rgregular';
+  }
+
+  #yearDD {
+    /* font-weight: bolder; */
+    color: white ;
+    background-color: gray;
+    border-width: 0 1px;
+    border: solid;
+    /* border-color: white  ; */
+    padding: 5px;
+    font-size: small;
+    font-family: 'proxima_nova_rgregular';
+  }
+
+  #sample-metadata {
+    padding: 15px;
+    color: #191a1a;	  
+  }
+
+  .material-icons{
+    position: relative;
+    font-size: 30px;
+    color:white;
+    cursor: pointer;
+    top: 13px;
+  }
+
+#one {
+    height: 550px;
+  }
+
+  #map{
+    height: 550px;
+    position: relative
+  }
+
+#map{
+    height: 550px;
+    position: relative
+  }
+ 
+html {
+    height: 100%;
+    position: relative;
+    /* font-family: ; */
+  }
