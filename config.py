@@ -1,0 +1,6 @@
+endpoint = 'conflict-africa.c7biawpsnxhf.us-east-2.rds.amazonaws.com'
+# remote_db_endpoint = 'database-2.czlbzbpdgtgg.us-east-1.rds.amazonaws.com'
+port = '5432'
+user = 'postgres'
+pwd = 'Project3!'
+name = 'postgres'

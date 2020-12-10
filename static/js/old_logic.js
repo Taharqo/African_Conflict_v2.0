@@ -1,9 +1,6 @@
-// To Do: 
-//    - build dict => {country_name:[{year1:specs1},{year2:specs2}....{yearN:specsN}]}
-// Create endpoint for geojson
-var endpoint_url = '/ultimate'
 
-var geojson_url = '/static/js/africaGeoJson.json'
+
+
 var old_event
 var selected_layer = 'Conflict'
 var selected_country = 'Algeria'
