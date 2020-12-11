@@ -115,11 +115,9 @@ function onEachFeature(feature, layer){
   })
 }
 
-function getFillColor(d, c) { // imporveo by using range and quartiles 
-    if (c === 0){
-      // console.log(d)
-      // console.log(d.properties.conflict_events)
-    
+function getFillColor(d, selectedLayer) { // imporveo by using range and quartiles 
+  if (selectedLayer === ' conflict'){
+      console.log('im in getfillColor')
       d = d.properties.conflict_events
      
       return  d > 1000 ? '#800026' :
@@ -131,7 +129,7 @@ function getFillColor(d, c) { // imporveo by using range and quartiles
               d > 10   ? '#FED976' :
                         '#FFEDA0';  
     }
-    else if(c === 1){
+    else if(selectedLayer === ' corruption'){
       d = d.properties.corruption_percentile
       return  d > 40  ? '#180080' :
               d > 35  ? '#2f198c' :
@@ -160,8 +158,8 @@ async_endpoint_data.then(endpoint_data => {
       }
     })
 
-    function layer_style(feature,c){
-      var fillColor = getFillColor(feature, c)
+    function layer_style(feature,selectedLayer){
+      var fillColor = getFillColor(feature, selectedLayer)
       return{
         fillColor: fillColor,
         color: 'black',
@@ -169,27 +167,32 @@ async_endpoint_data.then(endpoint_data => {
         }
     }
 
-    function setGeojsonLayer(c){ // imporve by using parameter values as function name. no need to use switch
+    function setGeojsonLayer(selectedLayer){ // imporve by using parameter values as function name. no need to use switch
       var geojson_layer = L.geoJson(geojson_data,{
-        style:function(feature){ return layer_style(feature, c)},
+        style:function(feature){ return layer_style(feature, selectedLayer)},
         onEachFeature:onEachFeature
       })
       return geojson_layer
+
     }
 
     var current_layer = setGeojsonLayer(0)
 
-    function updateMapLayer(c){
-        map.removeLayer(current_layer)
-        current_layer = setGeojsonLayer(c)
-        current_layer.addTo(map)
+    function updateMapLayer(selectedLayer){
+      map.removeLayer(current_layer)
+      current_layer = setGeojsonLayer(selectedLayer)
+      current_layer.addTo(map)
     }
 
-    console.log(document.getElementsByClassName('leaflet-control-layers-selector')[0].nextSibling.firstChild.nodeValue)
+    function setChloropleth(index){
+    
+      let selectedLayer = document.getElementsByClassName('leaflet-control-layers-selector')[index].nextSibling.firstChild.nodeValue
+      updateMapLayer(selectedLayer)
+    }
  
-    document.getElementsByClassName('leaflet-control-layers-selector')[0].addEventListener('click', function(){updateMapLayer(0)})
-    document.getElementsByClassName('leaflet-control-layers-selector')[1].addEventListener('click', function(){updateMapLayer(1)})
-    updateMapLayer(0)
+    document.getElementsByClassName('leaflet-control-layers-selector')[0].addEventListener('click', function(){setChloropleth(0)})
+    document.getElementsByClassName('leaflet-control-layers-selector')[1].addEventListener('click', function(){setChloropleth(1)})
+    setChloropleth(0)
   })
 })
 
