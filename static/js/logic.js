@@ -4,6 +4,10 @@
 var counter = 0
 var oldEvent = 0
 let c
+let selectedLayer 
+let clicked_country_event
+let clicked_country
+let current_event
 
 const async_endpoint_data = d3.json('/ultimate')
 const async_geojson_data = d3.json('/static/js/africaGeoJson.json')
@@ -78,8 +82,6 @@ function updateEventSequence_applyMouseEventsOldEvent(event, oldEvent){
 }
 
 function build_graph(x_axis, y_axis){
-  // console.log(x_axis)
-  // console.log(y_axis)
   let data = [{
     x:x_axis,
     y:y_axis,
@@ -93,18 +95,44 @@ function getClickedCountryInfo(clicked_country){
     async_endpoint_data.then(endpoint_data => {
     let country_info = endpoint_data.filter(c => (c.country_name == clicked_country))
     let year_array = country_info.map(c => c.year)
-    let value_array = country_info.map(c => c.conflict_events)
-    build_graph(year_array, value_array)  
+    let conflict_value_array = country_info.map(c => c.conflict_events)
+    let corruption_value_array = country_info.map(c => c.corruption_control_percentile)
+
+    if(selectedLayer == ' conflict'){
+      build_graph(year_array, conflict_value_array) 
+    }
+    else if(selectedLayer == ' corruption'){
+      build_graph(year_array, corruption_value_array) 
+    }
   })
 }
 
-function click(event){ 
-  var clicked_country = event.target.feature.properties.name
+let currentEvent
+let currentFeature
+
+
+function click(event){
+  // let lefletid = event.target._leaflet_id
+  console.log(event.target)
+  if(event == undefined){
+    event = current_event
+  }
+  current_event = event
+  
+  clicked_country = event.target.feature.properties.name
   clickMap_updateDropDown(clicked_country)
   mouseover(event)
   event.target.off({mouseout:mouseout})
-  oldEvent = updateEventSequence_applyMouseEventsOldEvent(event, oldEvent)// need better discriptive function name
+  oldEvent = updateEventSequence_applyMouseEventsOldEvent(event, oldEvent)//need better discriptive function name
   getClickedCountryInfo(clicked_country)
+  // let featureValues = document.getElementsByClassName('leaflet-interactive')
+  // featureValues[0].fireEvent('click')
+  // for(var i = 0; i <= featureValues.length; i++){
+    // console.log(featureValues[i])
+  // }
+  // featureValues.forEach(f => console.log(_leaflet_id))
+  // console.log(featureValues)
+  
 }
 
 function onEachFeature(feature, layer){
@@ -117,7 +145,6 @@ function onEachFeature(feature, layer){
 
 function getFillColor(d, selectedLayer) { // imporveo by using range and quartiles 
   if (selectedLayer === ' conflict'){
-      console.log('im in getfillColor')
       d = d.properties.conflict_events
      
       return  d > 1000 ? '#800026' :
@@ -143,6 +170,7 @@ function getFillColor(d, selectedLayer) { // imporveo by using range and quartil
     }    
 }
 
+// retreaves enpointdata for each country (for conflict and corruption) and adds it to the geojson for that country
 async_endpoint_data.then(endpoint_data => {
   async_geojson_data.then(geojson_data=>{
     endpoint_data.forEach(point_c => {
@@ -169,11 +197,10 @@ async_endpoint_data.then(endpoint_data => {
 
     function setGeojsonLayer(selectedLayer){ // imporve by using parameter values as function name. no need to use switch
       var geojson_layer = L.geoJson(geojson_data,{
-        style:function(feature){ return layer_style(feature, selectedLayer)},
+        style:function(feature){return layer_style(feature, selectedLayer)},
         onEachFeature:onEachFeature
       })
       return geojson_layer
-
     }
 
     var current_layer = setGeojsonLayer(0)
@@ -182,24 +209,40 @@ async_endpoint_data.then(endpoint_data => {
       map.removeLayer(current_layer)
       current_layer = setGeojsonLayer(selectedLayer)
       current_layer.addTo(map)
+      console.log(current_layer._layers)
+
+      // isolate country name from each layer
+      for(const [key, value] of Object.entries(current_layer._layers)){
+        for(const [key1, value1] of Object.entries(value)){
+          if(key1 == 'feature'){
+            for(const [key2, value2] of Object.entries(value1)){
+              if(key2 == 'properties'){
+                for(const [key3, value3] of Object.entries(value2)){
+                  if(key3 == 'name'){
+                    console.log(value3)
+                  }
+                }
+              }
+            }
+            
+          }
+        }
+      }
+
     }
 
-    function setChloropleth(index){
-    
-      let selectedLayer = document.getElementsByClassName('leaflet-control-layers-selector')[index].nextSibling.firstChild.nodeValue
+    function setChloropleth(index){    
+      selectedLayer = document.getElementsByClassName('leaflet-control-layers-selector')[index].nextSibling.firstChild.nodeValue
       updateMapLayer(selectedLayer)
     }
  
     document.getElementsByClassName('leaflet-control-layers-selector')[0].addEventListener('click', function(){setChloropleth(0)})
     document.getElementsByClassName('leaflet-control-layers-selector')[1].addEventListener('click', function(){setChloropleth(1)})
+
     setChloropleth(0)
   })
 })
 
 
-
-
 L.control.layers(baseMaps).addTo(map)
 populatedCountryDropDown()
-
-
